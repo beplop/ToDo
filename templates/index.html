@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo App</title>
+</head>
+<body>
+<h1>ToDo List</h1>
+<ul>
+    {% for task in tasks %}
+        <li>{{ task }} <a href="/remove/{{ loop.index0 }}">Remove</a></li>
+    {% endfor %}
+</ul>
+<form action="/add" method="post">
+    <input type="text" name="task" placeholder="Add a new task...">
+    <input type="submit" value="Add Task">
+</form>
+</body>
+</html>
