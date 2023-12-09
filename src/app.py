@@ -1,11 +1,46 @@
 import os
+from datetime import datetime
 
 from flask import Flask, request, redirect, render_template
 import psycopg2
 from psycopg2.extras import DictCursor
 
+from flask_sqlalchemy import SQLAlchemy
+
 template_dir = os.path.abspath('../templates/')
 app = Flask(__name__, template_folder=template_dir)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://admin:admin@192.168.99.100:6500/flask_todo_db'
+db = SQLAlchemy(app)
+
+class Users(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(50), nullable=False, unique=True)
+    password = db.Column(db.String(500), nullable=False)
+
+    def __repr__(self):
+        return f"<users {self.id}>"
+
+class Notes(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    text = db.Column(db.Text, nullable=True)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def __repr__(self):
+        return f"<profiles {self.id}>"
+
+with app.app_context():
+    db.create_all()
+
+    # db.session.add(Users('admin@example.com', '123'))
+    # db.session.add(Users('guest@example.com', '123'))
+    # db.session.commit()
+    #
+    # users = Users.query.all()
+    # print(users)
+
 
 tasks = []  # Список задач
 
