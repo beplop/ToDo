@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Архив</title>
+</head>
+<body>
+<h1>Архив</h1>
+<ul>
+    {% for task in archived_tasks %}
+        <li><a href="/to_archive/{{ task.id }}">Восстановить</a> {{ task.title }} <a href="/remove/{{ task.id }}">Удалить</a>
+        </li>
+    {% endfor %}
+</ul>
+
+<a href="/">К задачам</a>
+</body>
+</html>

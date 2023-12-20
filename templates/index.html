@@ -7,20 +7,25 @@
 </head>
 <body>
 <h1>ToDo List</h1>
-{#<ul>#}
-{#    {% for task in tasks %}#}
-{#        <li>{{ task }} <a href="/remove/{{ loop.index0 }}">Remove</a></li>#}
-{#    {% endfor %}#}
-{#</ul>#}
 <h2>Сегодня</h2>
-{##}
+<ul>
+    {% for task in tasks1 %}
+        <li><a href="/to_archive/{{ task.id }}">В архив</a> {{ task.title }} <a href="/remove/{{ task.id }}">Удалить</a>
+            <a href="/detail/{{ task.id }}">Изменить</a></li>
+    {% endfor %}
+</ul>
 <form action="/add" method="post">
     <input type="text" name="task1" placeholder="Напишите задачу...">
     <input type="submit" value="Добавить">
 </form>
 
 <h2>Завтра</h2>
-{##}
+<ul>
+    {% for task in tasks2 %}
+        <li><a href="/archive/{{ task.id }}">В архив</a> {{ task.title }} <a href="/remove/{{ task.id }}">Удалить</a> <a
+                href="/detail/{{ task.id }}">Изменить</a></li>
+    {% endfor %}
+</ul>
 <form action="/add" method="post">
     <input type="text" name="task2" placeholder="Напишите задачу...">
     <input type="submit" value="Добавить">
@@ -39,5 +44,10 @@
     <input type="text" name="task4" placeholder="Напишите задачу...">
     <input type="submit" value="Добавить">
 </form>
+
+<br>
+
+<a href="/archive/">Архив задач</a>
+
 </body>
 </html>

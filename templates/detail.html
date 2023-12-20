@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>task.title</title>
+</head>
+<body>
+<form action="/update/{{ task.id }}" method="post">
+    <h2>Задача:</h2>
+    <input type="text" name="task_title" value={{ task.title }}>
+    <br>
+    <h2>Описание:</h2>
+    <input type="text" name="task_text" value={% if task.text %} {{ task.text }} {% else %} "" {% endif %}>
+    <br>
+    <label for="task_scheduled_on">Запланировано на:</label>
+    <select name="task_scheduled_on" id="task_scheduled_on">
+        <option {% if task.scheduled_on == 1 %} selected {% endif %} value="1">Сегодня</option>
+        <option {% if task.scheduled_on == 2 %} selected {% endif %} value="2">Завтра</option>
+        <option {% if task.scheduled_on == 3 %} selected {% endif %} value="3">На этой неделе</option>
+        <option {% if task.scheduled_on == 4 %} selected {% endif %} value="4">Бессрочно</option>
+    </select>
+    <br>
+    <br>
+    <input type="submit" value="Ок">
+    <a href="/to_archive/{{ task.id }}">В архив</a>
+</form>
+</body>
+</html>

@@ -31,6 +31,7 @@ class Notes(db.Model):
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
     scheduled_on = db.Column(db.Integer, nullable=False, default=1)
     # 1 - сегодня, 2 - завтра, 3 - на этой неделе, 4 - бессрочно
+    is_archived = db.Column(db.Boolean, default=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
@@ -41,23 +42,26 @@ class Notes(db.Model):
 # with app.app_context():
 #     db.create_all()
 
-    # db.session.add(Users('admin@example.com', '123'))
-    # db.session.add(Users('guest@example.com', '123'))
-    # db.session.commit()
-    #
-    # users = Users.query.all()
-    # print(users)
+# db.session.add(Users('admin@example.com', '123'))
+# db.session.add(Users('guest@example.com', '123'))
+# db.session.commit()
+#
+# users = Users.query.all()
+# print(users)
 
 
 tasks = []  # Список задач
 
-
 conn = psycopg2.connect(dbname='flask_todo_db', user='admin',
                         password='admin', host='192.168.99.100', port='6500')
 
+
 @app.route('/')
 def index():
-    return render_template('index.html', tasks=tasks)
+    tasks1 = Notes.query.filter_by(scheduled_on=1, is_archived=False).all()
+    tasks2 = Notes.query.filter_by(scheduled_on=2).all()
+    return render_template('index.html', tasks1=tasks1, tasks2=tasks2)
+
 
 @app.route('/add', methods=['POST'])
 def add_task():
@@ -68,13 +72,13 @@ def add_task():
     if task1:
 
         try:
-            u = Users(email='abc@mail.ru', password='12345')
+            # u = Users(email='abc@mail.ru', password='12345')
+            #
+            # db.session.add(u)
+            # db.session.flush()
 
-            db.session.add(u)
-            db.session.flush()
-
-            n = Notes(title=task1, user_id=u.id, scheduled_on=1)
-            # n = Notes(title=task1, user_id=1)
+            # n = Notes(title=task1, user_id=u.id, scheduled_on=1)
+            n = Notes(title=task1, user_id=2, scheduled_on=1, is_archived=False)
             db.session.add(n)
             db.session.commit()
         except:
@@ -86,13 +90,13 @@ def add_task():
         # conn.commit()
     elif task2:
         try:
-            u = Users(email='bca@mail.ru', password='54321')
+            # u = Users(email='bca@mail.ru', password='54321')
+            #
+            # db.session.add(u)
+            # db.session.flush()
 
-            db.session.add(u)
-            db.session.flush()
-
-            n = Notes(title=task2, user_id=u.id, scheduled_on=2)
-            # n = Notes(title=task2, user_id=2)
+            # n = Notes(title=task2, user_id=u.id, scheduled_on=2)
+            n = Notes(title=task2, user_id=3, scheduled_on=2, is_archived=False)
             db.session.add(n)
             db.session.commit()
         except:
@@ -101,11 +105,63 @@ def add_task():
 
     return redirect('/')
 
-@app.route('/remove/<int:index>')
-def remove_task(index):
-    if 0 <= index < len(tasks):
-        del tasks[index]
+
+@app.route('/detail/<int:task_id>')
+def detail_view_task(task_id):
+    task = Notes.query.get(task_id)
+    return render_template('detail.html', task=task)
+
+
+@app.route('/update/<int:task_id>', methods=['POST'])
+def update_task(task_id):
+    new_title = request.form.get('task_title')
+    new_text = request.form.get('task_text')
+    new_scheduled_on = request.form.get('task_scheduled_on')
+    if new_title:
+        try:
+            task = Notes.query.get(task_id)
+            task.title = new_title
+            task.scheduled_on = new_scheduled_on
+
+            if new_text:
+                task.text = new_text
+
+            db.session.commit()
+        except:
+            db.session.rollback()
+            print("Ошибка обновления записи в БД")
     return redirect('/')
+
+
+@app.route('/remove/<int:task_id>')
+def remove_task(task_id):
+    try:
+        task_to_remove = Notes.query.get(task_id)
+        db.session.delete(task_to_remove)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        print("Ошибка удаления из БД")
+    return redirect('/')
+
+
+@app.route('/to_archive/<int:task_id>')
+def task_to_archive(task_id):
+    try:
+        task_to_archive = Notes.query.get(task_id)
+        task_to_archive.is_archived = not task_to_archive.is_archived
+        db.session.commit()
+    except:
+        db.session.rollback()
+        print("Ошибка добавления в архив записи")
+    return redirect('/')
+
+
+@app.route('/archive/')
+def archive():
+    archived_tasks = Notes.query.filter_by(is_archived=True).all()
+    return render_template('archive.html', archived_tasks=archived_tasks)
+
 
 # @app.route('/')
 # def hello_world():  # put application's code here
@@ -121,10 +177,8 @@ def remove_task(index):
 #     print(records[0])
 #     return records[0]
 
-    # return "hello world man! 12345678"
-
+# return "hello world man! 12345678"
 
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int("5000"))
-
