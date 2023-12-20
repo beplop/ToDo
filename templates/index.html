@@ -7,14 +7,37 @@
 </head>
 <body>
 <h1>ToDo List</h1>
-<ul>
-    {% for task in tasks %}
-        <li>{{ task }} <a href="/remove/{{ loop.index0 }}">Remove</a></li>
-    {% endfor %}
-</ul>
+{#<ul>#}
+{#    {% for task in tasks %}#}
+{#        <li>{{ task }} <a href="/remove/{{ loop.index0 }}">Remove</a></li>#}
+{#    {% endfor %}#}
+{#</ul>#}
+<h2>Сегодня</h2>
+{##}
 <form action="/add" method="post">
-    <input type="text" name="task" placeholder="Add a new task...">
-    <input type="submit" value="Add Task">
+    <input type="text" name="task1" placeholder="Напишите задачу...">
+    <input type="submit" value="Добавить">
+</form>
+
+<h2>Завтра</h2>
+{##}
+<form action="/add" method="post">
+    <input type="text" name="task2" placeholder="Напишите задачу...">
+    <input type="submit" value="Добавить">
+</form>
+
+<h2>На этой неделе</h2>
+{##}
+<form action="/add" method="post">
+    <input type="text" name="task3" placeholder="Напишите задачу...">
+    <input type="submit" value="Добавить">
+</form>
+
+<h2>Бессрочно</h2>
+{##}
+<form action="/add" method="post">
+    <input type="text" name="task4" placeholder="Напишите задачу...">
+    <input type="submit" value="Добавить">
 </form>
 </body>
 </html>
