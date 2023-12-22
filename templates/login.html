@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo App</title>
+</head>
+<body>
+<form action="" method="post" class="form-contact">
+    {{ form.hidden_tag() }}
+    {{ form.email.label() }} {{ form.email() }}
+    {{ form.psw.label() }} {{ form.psw() }}
+    {{ form.remember.label() }} {{ form.remember() }}
+    {{ form.submit() }}
+    <a href="{{ url_for('register') }}">Регистрация</a>
+</form>
+</body>
+</html>

@@ -1,24 +1,40 @@
 import os
 from datetime import datetime
 
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, url_for, flash
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
 import psycopg2
 from psycopg2.extras import DictCursor
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
+from forms import LoginForm, RegisterForm
+from UserLogin import UserLogin
+
+####
+
+
+####
+load_dotenv()
+
 template_dir = os.path.abspath('../templates/')
 app = Flask(__name__, template_folder=template_dir)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+print(os.getenv('SECRET_KEY'))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://admin:admin@192.168.99.100:6500/flask_todo_db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+login_manager = LoginManager(app)
 
 
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(75), nullable=False, unique=True)
-    password = db.Column(db.String(75), nullable=False)
+    password = db.Column(db.String(250), nullable=False)
 
     def __repr__(self):
         return f"<users {self.id}>"
@@ -39,6 +55,12 @@ class Notes(db.Model):
         return f"<notes {self.id}>"
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    print("load_user")
+    return UserLogin().fromDB(user_id, Users)
+
+
 # with app.app_context():
 #     db.create_all()
 
@@ -50,10 +72,8 @@ class Notes(db.Model):
 # print(users)
 
 
-tasks = []  # Список задач
-
-conn = psycopg2.connect(dbname='flask_todo_db', user='admin',
-                        password='admin', host='192.168.99.100', port='6500')
+# conn = psycopg2.connect(dbname='flask_todo_db', user='admin',
+#                         password='admin', host='192.168.99.100', port='6500')
 
 
 @app.route('/')
@@ -69,6 +89,8 @@ def add_task():
     task2 = request.form.get('task2')
     # task3 = request.form.get('task3')
     # task4 = request.form.get('task4')
+
+    # reduce func
     if task1:
 
         try:
@@ -161,6 +183,44 @@ def task_to_archive(task_id):
 def archive():
     archived_tasks = Notes.query.filter_by(is_archived=True).all()
     return render_template('archive.html', archived_tasks=archived_tasks)
+
+
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = Users.query.filter(Users.email == form.email.data).first()
+        if user and check_password_hash(user.password, form.psw.data):
+            userlogin = UserLogin().create(user)
+            # rm = form.remember.data
+            # login_user(userlogin, remember=rm)
+            login_user(userlogin)
+            # return redirect(request.args.get("next") or url_for("profile"))
+            return redirect(url_for('index'))
+
+        flash("Неверная пара логин/пароль", "error")
+    return render_template("login.html", form=form)
+
+
+@app.route("/register", methods=["POST", "GET"])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        try:
+            hash_psw = generate_password_hash(request.form['psw'])
+            u = Users(email=form.email.data, password=hash_psw)
+            db.session.add(u)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        flash("Вы успешно зарегистрированы", "success")
+        return redirect(url_for('login'))
+    else:
+        # log
+        flash("Ошибка при регистрации", "error")
+        print('Даннные формы введены неверно')
+    return render_template("register.html", form=form)
 
 
 # @app.route('/')
