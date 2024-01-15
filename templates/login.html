@@ -14,5 +14,10 @@
     {{ form.submit() }}
     <a href="{{ url_for('register') }}">Регистрация</a>
 </form>
+
+{% for cat, msg in get_flashed_messages(True) %}
+    <div class="flash {{ cat }}">{{ msg }}</div>
+{% endfor %}
+
 </body>
 </html>
