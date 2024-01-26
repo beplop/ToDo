@@ -98,7 +98,8 @@ def index():
     #
     email = current_user.get_email()
     #
-    return render_template('index.html', tasks1=tasks1, tasks2=tasks2, tasks3=tasks3, tasks4=tasks4, email=email)
+    return render_template('index.html', title='Задачи', tasks1=tasks1, tasks2=tasks2, tasks3=tasks3, tasks4=tasks4,
+                           email=email)
 
 
 @app.route('/add', methods=['POST'])
@@ -154,7 +155,7 @@ def add_task():
 @login_required
 def detail_view_task(task_id):
     task = Notes.query.get(task_id)
-    return render_template('detail.html', task=task)
+    return render_template('detail.html', title=task.title, task=task)
 
 
 @app.route('/update/<int:task_id>', methods=['POST'])
@@ -209,7 +210,7 @@ def task_to_archive(task_id):
 @login_required
 def archive():
     archived_tasks = Notes.query.filter_by(is_archived=True, user_id=current_user.get_id()).all()
-    return render_template('archive.html', archived_tasks=archived_tasks)
+    return render_template('archive.html', title='Архив', archived_tasks=archived_tasks)
 
 
 @app.route("/login", methods=["POST", "GET"])

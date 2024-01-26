@@ -1,76 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToDo App</title>
-</head>
-<body>
-{% if email %}
-    <h1>ToDo List</h1>
-    <h2>Сегодня</h2>
-    <ul>
-        {% for task in tasks1 %}
-            <li><a href="/to_archive/{{ task.id }}">В архив</a> {{ task.title }} <a
-                    href="/remove/{{ task.id }}">Удалить</a>
-                <a href="/detail/{{ task.id }}">Изменить</a></li>
-        {% endfor %}
-    </ul>
-    <form action="/add" method="post">
-        <input type="text" name="task1" placeholder="Напишите задачу...">
-        <input type="submit" value="Добавить">
-    </form>
+{% extends 'layout.html' %}
 
-    <h2>Завтра</h2>
-    <ul>
-        {% for task in tasks2 %}
-            <li><a href="{{ url_for('task_to_archive', task_id=task.id) }}">В архив</a> {{ task.title }} <a
-                    href="/remove/{{ task.id }}">Удалить</a> <a
-                    href="/detail/{{ task.id }}">Изменить</a></li>
-        {% endfor %}
-    </ul>
-    <form action="/add" method="post">
-        <input type="text" name="task2" placeholder="Напишите задачу...">
-        <input type="submit" value="Добавить">
-    </form>
+{% block content %}
+    {{ super() }}
+    <div class="container">
+        <div class="row">
+            <div class="col"></div>
+            <div class="col">
+                <h2>Сегодня</h2>
+                <ul>
+                    {% for task in tasks1 %}
+                        <li><a href="/to_archive/{{ task.id }}">В архив</a> {{ task.title }} <a
+                                href="/remove/{{ task.id }}">Удалить</a>
+                            <a href="/detail/{{ task.id }}">Изменить</a></li>
+                    {% endfor %}
+                </ul>
+                <form action="/add" method="post">
+                    <input type="text" name="task1" placeholder="Напишите задачу...">
+                    <input type="submit" value="Добавить">
+                </form>
 
-    <h2>На этой неделе</h2>
-    <ul>
-        {% for task in tasks3 %}
-            <li><a href="{{ url_for('task_to_archive', task_id=task.id) }}">В архив</a> {{ task.title }} <a
-                    href="/remove/{{ task.id }}">Удалить</a> <a
-                    href="/detail/{{ task.id }}">Изменить</a></li>
-        {% endfor %}
-    </ul>
-    <form action="/add" method="post">
-        <input type="text" name="task3" placeholder="Напишите задачу...">
-        <input type="submit" value="Добавить">
-    </form>
+                <h2>Завтра</h2>
+                <ul>
+                    {% for task in tasks2 %}
+                        <li><a href="{{ url_for('task_to_archive', task_id=task.id) }}">В архив</a> {{ task.title }} <a
+                                href="/remove/{{ task.id }}">Удалить</a> <a
+                                href="/detail/{{ task.id }}">Изменить</a></li>
+                    {% endfor %}
+                </ul>
+                <form action="/add" method="post">
+                    <input type="text" name="task2" placeholder="Напишите задачу...">
+                    <input type="submit" value="Добавить">
+                </form>
 
-    <h2>Бессрочно</h2>
-    <ul>
-        {% for task in tasks4 %}
-            <li><a href="{{ url_for('task_to_archive', task_id=task.id) }}">В архив</a> {{ task.title }} <a
-                    href="/remove/{{ task.id }}">Удалить</a> <a
-                    href="/detail/{{ task.id }}">Изменить</a></li>
-        {% endfor %}
-    </ul>
-    <form action="/add" method="post">
-        <input type="text" name="task4" placeholder="Напишите задачу...">
-        <input type="submit" value="Добавить">
-    </form>
+                <h2>На этой неделе</h2>
+                <ul>
+                    {% for task in tasks3 %}
+                        <li><a href="{{ url_for('task_to_archive', task_id=task.id) }}">В архив</a> {{ task.title }} <a
+                                href="/remove/{{ task.id }}">Удалить</a> <a
+                                href="/detail/{{ task.id }}">Изменить</a></li>
+                    {% endfor %}
+                </ul>
+                <form action="/add" method="post">
+                    <input type="text" name="task3" placeholder="Напишите задачу...">
+                    <input type="submit" value="Добавить">
+                </form>
 
-    <br>
+                <h2>Бессрочно</h2>
+                <ul>
+                    {% for task in tasks4 %}
+                        <li><a href="{{ url_for('task_to_archive', task_id=task.id) }}">В архив</a> {{ task.title }} <a
+                                href="/remove/{{ task.id }}">Удалить</a> <a
+                                href="/detail/{{ task.id }}">Изменить</a></li>
+                    {% endfor %}
+                </ul>
+                <form action="/add" method="post">
+                    <input type="text" name="task4" placeholder="Напишите задачу...">
+                    <input type="submit" value="Добавить">
+                </form>
+            </div>
+            <div class="col"></div>
+        </div>
+    </div>
+{% endblock %}
+{#<a href="/archive/">Архив задач</a>#}
+{##}
+{#<h3>{{ email }}</h3> <a href="{{ url_for('logout') }}">Выйти из аккаунта</a>#}
 
-    <a href="/archive/">Архив задач</a>
+{#{% else %}#}
+{#    <h1>Вы не авторизовались</h1>#}
+{#    <a href="{{ url_for('login') }}">Войти</a>#}
+{#    <a href="{{ url_for('register') }}">Регистрация</a>#}
+{#{% endif %}#}
 
-    <h3>{{ email }}</h3> <a href="{{ url_for('logout') }}">Выйти из аккаунта</a>
-
-{% else %}
-    <h1>Вы не авторизовались</h1>
-    <a href="{{ url_for('login') }}">Войти</a>
-    <a href="{{ url_for('register') }}">Регистрация</a>
-{% endif %}
 {#<div>#}
 {#    {% if email %}#}
 {#        <h3>{{ email }}</h3> <a href="{{ url_for('logout') }}">Выйти из аккаунта</a>#}
@@ -79,6 +80,3 @@
 {#    {% endif %}#}
 {#</div>#}
 
-
-</body>
-</html>
