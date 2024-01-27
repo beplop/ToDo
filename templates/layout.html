@@ -12,15 +12,17 @@
         {% else %}
             <title>ToDo App</title>
         {% endif %}
+        <script src="https://kit.fontawesome.com/05c65e9b1c.js" crossorigin="anonymous"></script>
     {% endblock %}
 </head>
 <body>
 {% block content -%}
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
             crossorigin="anonymous"></script>
     {#Шапка#}
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="p-2 fs-5 bg-warning navbar navbar-dark navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('index') }}">ToDo App</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -31,18 +33,22 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Задачи</a>
+                        <a {% if cur_page == 1 %} class="nav-link active" aria-current="page" {% else %}
+                                                  class="nav-link" {% endif %} href="{{ url_for('index') }}">Задачи</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('archive') }}">Архив</a>
+                        <a {% if cur_page == 2 %} class="nav-link active" aria-current="page" {% else %}
+                                                  class="nav-link" {% endif %} href="{{ url_for('archive') }}">Архив</a>
                     </li>
                 </ul>
-                <div class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="???">{{ current_user.get_email() }}</a>
-                </div>
-                <div class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{{ url_for('logout') }}">Выйти</a>
-                </div>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="???">{{ current_user.get_email() }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Выйти</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>

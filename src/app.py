@@ -91,15 +91,20 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    tasks1 = Notes.query.filter_by(scheduled_on=1, is_archived=False, user_id=current_user.get_id()).all()
-    tasks2 = Notes.query.filter_by(scheduled_on=2, is_archived=False, user_id=current_user.get_id()).all()
-    tasks3 = Notes.query.filter_by(scheduled_on=3, is_archived=False, user_id=current_user.get_id()).all()
-    tasks4 = Notes.query.filter_by(scheduled_on=4, is_archived=False, user_id=current_user.get_id()).all()
+    tasks = [Notes.query.filter_by(scheduled_on=indx, is_archived=False, user_id=current_user.get_id()).all() for indx
+             in
+             range(1, 5)]
+    tasks_scheduled_on = ['Сегодня', 'Завтра', 'На этой неделе', 'Бессрочно']
+    # tasks1 = Notes.query.filter_by(scheduled_on=1, is_archived=False, user_id=current_user.get_id()).all()
+    # tasks2 = Notes.query.filter_by(scheduled_on=2, is_archived=False, user_id=current_user.get_id()).all()
+    # tasks3 = Notes.query.filter_by(scheduled_on=3, is_archived=False, user_id=current_user.get_id()).all()
+    # tasks4 = Notes.query.filter_by(scheduled_on=4, is_archived=False, user_id=current_user.get_id()).all()
     #
-    email = current_user.get_email()
+    # email = current_user.get_email()
     #
-    return render_template('index.html', title='Задачи', tasks1=tasks1, tasks2=tasks2, tasks3=tasks3, tasks4=tasks4,
-                           email=email)
+    # return render_template('index.html', title='Задачи', tasks1=tasks1, tasks2=tasks2, tasks3=tasks3, tasks4=tasks4,
+    #                        email=email)
+    return render_template('index.html', title='Задачи', tasks=tasks, tasks_scheduled_on=tasks_scheduled_on, cur_page=1)
 
 
 @app.route('/add', methods=['POST'])
@@ -210,7 +215,7 @@ def task_to_archive(task_id):
 @login_required
 def archive():
     archived_tasks = Notes.query.filter_by(is_archived=True, user_id=current_user.get_id()).all()
-    return render_template('archive.html', title='Архив', archived_tasks=archived_tasks)
+    return render_template('archive.html', title='Архив', archived_tasks=archived_tasks, cur_page=2)
 
 
 @app.route("/login", methods=["POST", "GET"])
