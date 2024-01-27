@@ -24,7 +24,7 @@
                             </li>
                         {% endfor %}
                     </ul>
-                    <form class="row row-cols-lg-auto g-2" action="/add" method="post">
+                    <form class="row row-cols-lg-auto g-2" action="{{ url_for('add_task') }}" method="post">
                         <div class="col">
                             <input type="text" class="form-control mb-2 mr-sm-2" id="inlineFormInputName2"
                                    name="{{ "task" + loop.index|string }}"

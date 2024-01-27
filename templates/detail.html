@@ -3,23 +3,32 @@
 {% block content %}
     {{ super() }}
     {#    <title>task.title</title>#}
-    <form action="/update/{{ task.id }}" method="post">
-        <h2>Задача:</h2>
-        <input type="text" name="task_title" value={{ task.title }}>
-        <br>
-        <h2>Описание:</h2>
-        <input type="text" name="task_text" value={% if task.text %} {{ task.text }} {% else %} "" {% endif %}>
-        <br>
-        <label for="task_scheduled_on">Запланировано на:</label>
-        <select name="task_scheduled_on" id="task_scheduled_on">
-            <option {% if task.scheduled_on == 1 %} selected {% endif %} value="1">Сегодня</option>
-            <option {% if task.scheduled_on == 2 %} selected {% endif %} value="2">Завтра</option>
-            <option {% if task.scheduled_on == 3 %} selected {% endif %} value="3">На этой неделе</option>
-            <option {% if task.scheduled_on == 4 %} selected {% endif %} value="4">Бессрочно</option>
-        </select>
-        <br>
-        <br>
-        <input type="submit" value="Ок">
-        <a href="/to_archive/{{ task.id }}">В архив</a>
-    </form>
+    <div class="container">
+    <div class="row">
+    <div class="col"></div>
+    <div class="col">
+        <form action="{{ url_for('update_task', task_id=task.id) }}" method="post">
+            <h2 class="text-warning text-uppercase">Задача:</h2>
+            <input class="form-control mb-2 mr-sm-2" type="text" name="task_title" value={{ task.title }}>
+            <h2 class="text-warning text-uppercase">Описание:</h2>
+            <div class="form-floating">
+                {#            ЗДЕСЬ БАГ С ДОБАВЛЕНИЕМ ПУСТОГО ТЕКСТА#}
+                <textarea name="task_text" class="form-control mb-2 mr-sm-2">{% if task.text %}{{ task.text }}{% else %}
+                {% endif %}</textarea>
+            </div>
+            {#            <input class="form-control mb-2 mr-sm-2" type="text" name="task_text"#}
+            {#                   value={% if task.text %} {{ task.text }} {% else %} "" {% endif %}>#}
+            <label for="task_scheduled_on"><h3 class="text-warning text-uppercase">Запланировано на:</h3></label>
+            <select class="form-select mb-2" name="task_scheduled_on" id="task_scheduled_on">
+                <option {% if task.scheduled_on == 1 %} selected {% endif %} value="1">Сегодня</option>
+                <option {% if task.scheduled_on == 2 %} selected {% endif %} value="2">Завтра</option>
+                <option {% if task.scheduled_on == 3 %} selected {% endif %} value="3">На этой неделе</option>
+                <option {% if task.scheduled_on == 4 %} selected {% endif %} value="4">Бессрочно</option>
+            </select>
+            <input class="btn btn-success mb-2" type="submit" value="Ок">
+            <a class="btn btn-danger mb-2" {{ url_for('task_to_archive', task_id=task.id) }}
+               href="/to_archive/{{ task.id }}">Переместить в архив</a>
+        </form>
+    </div>
+    <div class="col"></div>
 {% endblock %}

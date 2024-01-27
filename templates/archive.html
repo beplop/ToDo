@@ -2,11 +2,25 @@
 
 {% block content %}
     {{ super() }}
-    <h1>Архив</h1>
-    <ul>
-        {% for task in archived_tasks %}
-            <li><a href="/to_archive/{{ task.id }}">Восстановить</a> {{ task.title }} <a href="/remove/{{ task.id }}">Удалить</a>
-            </li>
-        {% endfor %}
-    </ul>
+    <div class="container">
+        <div class="row">
+            <div class="col"></div>
+            <div class="col">
+                <h2 class="text-warning text-uppercase">Архив</h2>
+                <ul class="list-inline">
+                    {% for task in archived_tasks %}
+                        <li>
+                            <a href="{{ url_for('task_to_archive', task_id=task.id) }}"><i style="color: lightgreen;"
+                                                                                           class="fa-solid fa-arrow-rotate-left"></i></a>
+                            {{ task.title }}
+                            <a href="{{ url_for('remove_task', task_id=task.id) }}"><i class="fa-solid fa-xmark fa-lg"
+                                                                                       style="color: #f52424;"></i></a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col"></div>
+        </div>
+    </div>
+
 {% endblock %}
