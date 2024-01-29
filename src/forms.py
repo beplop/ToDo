@@ -4,8 +4,9 @@ from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 
 class LoginForm(FlaskForm):
-    email = StringField("Email: ", validators=[Email()])
-    psw = PasswordField("Пароль: ", validators=[DataRequired(), Length(min=4, max=75)])
+    email = StringField("Email: ", validators=[Email("Некорректный email")])
+    psw = PasswordField("Пароль: ", validators=[DataRequired(), Length(min=4, max=75,
+                                                                       message="Пароль должен быть от 4 до 75 символов")])
     remember = BooleanField("Запомнить", default=False)
     submit = SubmitField("Войти")
 
@@ -18,3 +19,16 @@ class RegisterForm(FlaskForm):
 
     psw2 = PasswordField("Повтор пароля: ", validators=[DataRequired(), EqualTo('psw', message="Пароли не совпадают")])
     submit = SubmitField("Регистрация")
+
+
+class PasswordUpdateForm(FlaskForm):
+    psw_current = PasswordField("Текущий пароль: ", validators=[DataRequired(),
+                                                                Length(min=4, max=75,
+                                                                       message="Пароль должен быть от 4 до 75 символов")])
+    psw_new = PasswordField("Новый пароль: ", validators=[DataRequired(),
+                                                          Length(min=4, max=75,
+                                                                 message="Пароль должен быть от 4 до 75 символов")])
+
+    psw_new2 = PasswordField("Повторите пароль: ",
+                             validators=[DataRequired(), EqualTo('psw_new', message="Пароли не совпадают")])
+    submit = SubmitField("Сменить пароль")

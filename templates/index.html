@@ -8,31 +8,33 @@
             <div class="col"></div>
             <div class="col">
                 {% for task_block in tasks %}
-                    <h2 class="text-warning text-uppercase">{{ tasks_scheduled_on[loop.index0] }}</h2>
-                    <ul class="list-inline">
-                        {% for task in task_block %}
-                            <li>
-                                <a href="{{ url_for('task_to_archive', task_id=task.id) }}"><i
-                                        class="fa-regular fa-circle fa-lg"
-                                        style="color: #000000;"></i></a>
-                                {{ task.title }}
-                                <a href="{{ url_for('remove_task', task_id=task.id) }}"><i
-                                        class="fa-solid fa-xmark fa-lg"
-                                        style="color: #f52424;"></i></a>
-                                <a href="{{ url_for('detail_view_task', task_id=task.id) }}"><i
-                                        class="fa-solid fa-circle-info fa-lg" style="color: #74C0FC;"></i></a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    <form class="row row-cols-lg-auto g-2" action="{{ url_for('add_task') }}" method="post">
-                        <div class="col">
-                            <input type="text" class="form-control mb-2 mr-sm-2" id="inlineFormInputName2"
-                                   name="{{ "task" + loop.index|string }}"
-                                   placeholder="Напишите задачу...">
-                        </div>
-                        <div class="col">
-                            <input class="btn btn-warning mb-2" type="submit" value="Добавить">
-                        </div>
+                    <h2 class="text-warning text-uppercase text-center">{{ tasks_scheduled_on[loop.index0] }}</h2>
+                    <div class="border border-2 border-warning rounded m-3 p-3">
+                        <ul class="list-inline">
+                            {% for task in task_block %}
+                                <li>
+                                    <a href="{{ url_for('task_to_archive', task_id=task.id) }}"><i
+                                            class="fa-regular fa-circle fa-lg"
+                                            style="color: #000000;"></i></a>
+                                    {{ task.title }}
+                                    <a href="{{ url_for('remove_task', task_id=task.id) }}"><i
+                                            class="fa-solid fa-xmark fa-lg"
+                                            style="color: #f52424;"></i></a>
+                                    <a href="{{ url_for('detail_view_task', task_id=task.id) }}"><i
+                                            class="fa-solid fa-circle-info fa-lg" style="color: #74C0FC;"></i></a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <form class="row row-cols-lg-auto g-2" action="{{ url_for('add_task') }}" method="post">
+                            <div class="col">
+                                <input type="text" class="form-control mb-2 mr-sm-2" id="inlineFormInputName2"
+                                       name="{{ "task" + loop.index|string }}"
+                                       placeholder="Напишите задачу...">
+                            </div>
+                            <div class="col">
+                                <input class="btn btn-warning mb-2" type="submit" value="Добавить">
+                            </div>
+                    </div>
 
                     </form>
 

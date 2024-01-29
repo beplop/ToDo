@@ -1,0 +1,58 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    {{ super() }}
+    <div class="container">
+        <div class="row">
+            <div class="col"></div>
+            <div class="col">
+                <h2 class="text-warning text-uppercase text-center">Профиль</h2>
+                <div class="border border-2 border-warning rounded m-3 p-3">
+                    <div class="p-2">
+                        <p class="d-inline text-warning">Ваш e-mail: </p>
+                        <p class="d-inline">{{ current_user.get_email() }}</p>
+                    </div>
+                    <div class="p-2">
+                        <p class="d-inline text-warning">Всего задач: </p>
+                        <p class="d-inline">{{ tasks_count }}</p>
+                    </div>
+                    <div class="p-2">
+                        <p class="d-inline text-warning">Задач в архиве: </p>
+                        <p class="d-inline">{{ tasks_count_archived }}</p>
+                    </div>
+
+                    <div class="p-2"><h5 class="text-warning text-center">Смена пароля:</h5></div>
+                    <form action="{{ url_for('profile') }}" method="post">
+                        {{ form.hidden_tag() }}
+                        {% for field in form if field.name not in ['csrf_token', 'submit'] -%}
+                            {{ field.label(class="text-warning") }}
+                            {% if field.errors %}
+                                {{ field(class="form-control mb-2 mr-sm-2") }}
+                                <div class="alert alert-danger">
+                                    {% for e in field.errors %}
+                                        {{ e }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ field(class="form-control mb-2 mr-sm-2") }}
+                            {% endif %}
+                        {% endfor %}
+
+                        {{ form.submit(class="btn btn-warning mb-2") }}
+                        {#                                            {{ form.hidden_tag() }}#}
+                        {#                                            {{ form.psw_current.label(class="text-warning") }} {{ form.psw_current(class="form-control mb-2 mr-sm-2") }}#}
+                        {#                                            {{ form.psw_new.label(class="text-warning") }} {{ form.psw_new(class="form-control mb-2 mr-sm-2") }}#}
+                        {#                                            {{ form.psw_new2.label(class="text-warning") }} {{ form.psw_new2(class="form-control mb-2 mr-sm-2") }}#}
+                        {#                                            {{ form.submit(class="btn btn-warning mb-2") }}#}
+                    </form>
+
+                    {% for cat, msg in get_flashed_messages(True) %}
+                        <div class="alert alert-{{ cat }}">{{ msg }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col"></div>
+        </div>
+    </div>
+
+{% endblock %}

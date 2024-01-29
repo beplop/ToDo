@@ -1,11 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToDo App - авторизация</title>
-</head>
-<body>
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}
+    ToDo App - авторизация
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <br>
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6">
+                <form action="{{ url_for('login') }}" method="post">
+                    {{ form.hidden_tag() }}
+                    {{ wtf.form_field(form.email) }}
+                    {{ wtf.form_field(form.psw) }}
+                    {{ wtf.form_field(form.remember) }}
+                    {{ wtf.form_field(form.submit, button_map={'submit':'warning'}) }}
+                    <a href="{{ url_for('register') }}">Регистрация</a>
+                </form>
+                <br>
+
+                {#        <form action="{{ url_for('login') }}" method="post">#}
+                {#            {{ form.hidden_tag() }}#}
+                {#            {% for field in form if field.name not in ['csrf_token', 'remember', 'submit'] -%}#}
+                {#                        <div class="mb-3">#}
+                {#                {{ field.label() }}#}
+                {#                {% if field.errors %}#}
+                {#                    {{ field(class="invalid") }}#}
+                {#                    <span>#}
+                {#                           {% for e in field.errors %}#}
+                {#                               {{ e }}#}
+                {#                           {% endfor %}#}
+                {#                 </span>#}
+                {#                {% else %}#}
+                {#                    {{ wtf.form_field(field) }}#}
+                {#                {% endif %}#}
+                {#                        </div>#}
+                {#            {% endfor %}#}
+                {#                    <div class="mb-3 form-check">#}
+                {#            {{ form.remember.label(class="form-check-label") }} {{ form.remember(class="form-check-input" ) }}#}
+                {#                    </div>#}
+                {#            {{ form.submit(class="btn btn-primary") }}#}
+                {#            <a href="{{ url_for('register') }}">Регистрация</a>#}
+                {#        </form>#}
+
+                {% for cat, msg in get_flashed_messages(True) %}
+                    <div class="alert alert-{{ cat }}">{{ msg }}</div>
+                {% endfor %}
+            </div>
+            <div class="col-sm-3"></div>
+        </div>
+    </div>
+
+{% endblock %}
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>ToDo App - авторизация</title>#}
+{#</head>#}
+{#<body>#}
+
 {#<form action="" method="post">#}
 {#    <div class="mb-3">#}
 {#        <label for="exampleInputEmail1" class="form-label">Email address</label>#}
@@ -22,18 +77,40 @@
 {#    </div>#}
 {#    <button type="submit" class="btn btn-primary">Submit</button>#}
 {#</form>#}
-<form action="" method="post" class="form-contact">
-    {{ form.hidden_tag() }}
-    {{ form.email.label() }} {{ form.email() }}
-    {{ form.psw.label() }} {{ form.psw() }}
-    {{ form.remember.label() }} {{ form.remember() }}
-    {{ form.submit() }}
-    <a href="{{ url_for('register') }}">Регистрация</a>
-</form>
 
-{% for cat, msg in get_flashed_messages(True) %}
-    <div class="flash {{ cat }}">{{ msg }}</div>
-{% endfor %}
+{#<form action="{{ url_for('login') }}" method="post" class="form-contact">#}
+{#    {{ form.hidden_tag() }}#}
+{#    {% for field in form if field.name not in ['csrf_token', 'remember', 'submit'] -%}#}
+{#        <div class="mb-3">#}
+{#            {{ field.label(class="form-label") }}#}
+{#            {% if field.errors %}#}
+{#                {{ field(class="invalid") }}#}
+{#                <span class="invalid-feedback">#}
+{#                   {% for e in field.errors %}#}
+{#                       {{ e }}#}
+{#                   {% endfor %}#}
+{#         </span>#}
+{#            {% else %}#}
+{#                {{ field(class="form-control") }}#}
+{#            {% endif %}#}
+{#        </div>#}
+{#    {% endfor %}#}
+{#    <div class="mb-3 form-check">#}
+{#        {{ form.remember.label(class="form-check-label") }} {{ form.remember(class="form-check-input" ) }}#}
+{#    </div>#}
+{#    {{ form.submit(class="btn btn-primary") }}#}
+{#    <a href="{{ url_for('register') }}">Регистрация</a>#}
+{#</form>#}
 
-</body>
-</html>
+{#<form action="" method="post" class="form-contact">#}
+{#    {{ form.hidden_tag() }}#}
+{#    {{ form.email.label() }} {{ form.email() }}#}
+{#    {{ form.psw.label() }} {{ form.psw() }}#}
+{#    {{ form.remember.label() }} {{ form.remember() }}#}
+{#    {{ form.submit() }}#}
+{#    <a href="{{ url_for('register') }}">Регистрация</a>#}
+{#</form>#}
+
+{##}
+{#</body>#}
+{#</html>#}

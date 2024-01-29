@@ -4,6 +4,7 @@ from functools import reduce
 
 from flask import Flask, request, redirect, render_template, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_bootstrap import Bootstrap
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 import psycopg2
@@ -12,7 +13,7 @@ from psycopg2.extras import DictCursor
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-from forms import LoginForm, RegisterForm
+from forms import LoginForm, RegisterForm, PasswordUpdateForm
 from UserLogin import UserLogin
 
 ####
@@ -28,6 +29,9 @@ print(os.getenv('SECRET_KEY'))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://admin:admin@192.168.99.100:6500/flask_todo_db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+Bootstrap(app)
+app.config['BOOTSTRAP_BTN_STYLE'] = 'warning'
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -233,7 +237,7 @@ def login():
             # return redirect(request.args.get("next") or url_for("profile"))
             return redirect(request.args.get("next") or url_for('index'))
 
-        flash("Неверная пара логин/пароль", "error")
+        flash("Неверная пара логин/пароль", "danger")
     return render_template("login.html", form=form)
 
 
@@ -243,7 +247,7 @@ def register():
     if form.validate_on_submit():
         try:
             if Users.query.filter(Users.email == form.email.data).first():
-                flash("Такой пользователь уже существует", "error")
+                flash("Такой пользователь уже существует", "danger")
                 return redirect(url_for('register'))
             else:
                 hash_psw = generate_password_hash(request.form['psw'])
@@ -253,14 +257,65 @@ def register():
         except Exception as e:
             db.session.rollback()
             print(e)
+            return redirect(url_for('register'))
         flash("Вы успешно зарегистрированы", "success")
         return redirect(url_for('login'))
     else:
         if form.is_submitted():
             # log
-            flash("Ошибка при регистрации", "error")
+            flash("Ошибка при регистрации", "danger")
             print('Даннные формы введены неверно или что-то пошло не так')
     return render_template("register.html", form=form)
+
+
+@app.route('/profile', methods=["POST", "GET"])
+@login_required
+def profile():
+    tasks_count = sum(
+        [len(Notes.query.filter_by(scheduled_on=indx, is_archived=False, user_id=current_user.get_id()).all()) for indx
+         in
+         range(1, 5)])
+
+    tasks_count_archived = len(Notes.query.filter_by(is_archived=True, user_id=current_user.get_id()).all())
+
+    form = PasswordUpdateForm()
+
+    if form.validate_on_submit():
+        try:
+            user = Users.query.filter(Users.id == current_user.get_id()).first()
+            if check_password_hash(user.password, form.psw_current.data):
+                # hash_current_psw = generate_password_hash(request.form['psw_current'])
+
+                if form.psw_new.data == form.psw_current.data:
+                    flash("Новый пароль совпадает со старым", "danger")
+                    return redirect(url_for('profile'))
+                else:
+                    hash_new_psw = generate_password_hash(request.form['psw_new'])
+
+                    db.session.query(Users).filter(Users.id == current_user.get_id()).update(
+                        {"password": hash_new_psw}, synchronize_session="fetch"
+                    )
+
+                    # result = db.session.execute(stmt)
+
+                    # db.session.execute(stmt)
+                    db.session.commit()
+            else:
+                flash("Текущий пароль введён неверно", "danger")
+                return redirect(url_for('profile'))
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+            return redirect(url_for('profile'))
+        flash("Вы успешно сменили пароль", "success")
+    else:
+        if form.is_submitted():
+            # log
+            flash("Ошибка при смене пароля", "danger")
+            print('Даннные формы введены неверно или что-то пошло не так')
+
+    return render_template('profile.html', title='Профиль', cur_page=3, form=form, tasks_count=tasks_count,
+                           tasks_count_archived=tasks_count_archived)
 
 
 # @app.route('/')

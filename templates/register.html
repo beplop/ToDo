@@ -1,36 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToDo App</title>
-</head>
-<body>
-<form action="{{ url_for('register') }}" method="post" class="form-contact">
-    {{ form.hidden_tag() }}
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}
+    ToDo App - Регистрация
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <br>
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6">
+                <form action="{{ url_for('register') }}" method="post">
+                    {{ form.hidden_tag() }}
+                    {{ wtf.form_field(form.email) }}
+                    {{ wtf.form_field(form.psw) }}
+                    {{ wtf.form_field(form.psw2) }}
+                    {{ wtf.form_field(form.submit, button_map={'submit':'warning'}) }}
+                    <a href="{{ url_for('login') }}">Уже зарегистрированы?</a>
+                </form>
+                <br>
 
-    {% for field in form if field.name not in ['csrf_token', 'submit'] -%}
-        <p>{{ field.label() }}
-        {% if field.errors %}
-            {{ field(class="invalid") }}
-            <span class="invalid-feedback">
-		{% for e in field.errors %}
-            {{ e }}
-        {% endfor %}
-	</span>
-        {% else %}
-            {{ field() }}
-        {% endif %}
-    {% endfor %}
+                {% for cat, msg in get_flashed_messages(True) %}
+                    <div class="alert alert-{{ cat }}">{{ msg }}</div>
+                {% endfor %}
+            </div>
+            <div class="col-sm-3"></div>
+        </div>
+    </div>
 
-    <p>{{ form.submit() }}
-</form>
-
-<a href="{{ url_for('login') }}">Авторизация</a>
-
-{% for cat, msg in get_flashed_messages(True) %}
-    <div class="flash {{ cat }}">{{ msg }}</div>
-{% endfor %}
+{% endblock %}
 
 {#<form action="" method="post" class="form-contact">#}
 {#    {{ form.hidden_tag() }}#}
@@ -40,5 +37,3 @@
 {#    {{ form.submit() }}#}
 {#    <a href="{{ url_for('login') }}">Уже зарегистрированы?</a>#}
 {#</form>#}
-</body>
-</html>
