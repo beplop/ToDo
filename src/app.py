@@ -36,7 +36,7 @@ app.config['BOOTSTRAP_BTN_STYLE'] = 'warning'
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message = "Вы не авторизованы"
-login_manager.login_message_category = "success"
+login_manager.login_message_category = "warning"
 
 
 class Users(db.Model):
@@ -238,7 +238,7 @@ def login():
             return redirect(request.args.get("next") or url_for('index'))
 
         flash("Неверная пара логин/пароль", "danger")
-    return render_template("login.html", form=form)
+    return render_template("login.html", form=form, title='Авторизация')
 
 
 @app.route("/register", methods=["POST", "GET"])
@@ -265,7 +265,7 @@ def register():
             # log
             flash("Ошибка при регистрации", "danger")
             print('Даннные формы введены неверно или что-то пошло не так')
-    return render_template("register.html", form=form)
+    return render_template("register.html", form=form, title='Регистрация')
 
 
 @app.route('/profile', methods=["POST", "GET"])

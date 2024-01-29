@@ -1,29 +1,44 @@
-{% extends "bootstrap/base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
-{% block title %}
-    ToDo App - Регистрация
-{% endblock %}
-{% block content %}
-    <div class="container">
-        <div class="row justify-content-center">
-            <br>
-            <div class="col-sm-3"></div>
-            <div class="col-sm-6">
-                <form action="{{ url_for('register') }}" method="post">
-                    {{ form.hidden_tag() }}
-                    {{ wtf.form_field(form.email) }}
-                    {{ wtf.form_field(form.psw) }}
-                    {{ wtf.form_field(form.psw2) }}
-                    {{ wtf.form_field(form.submit, button_map={'submit':'warning'}) }}
-                    <a href="{{ url_for('login') }}">Уже зарегистрированы?</a>
-                </form>
-                <br>
+{% extends 'layout.html' %}
 
-                {% for cat, msg in get_flashed_messages(True) %}
-                    <div class="alert alert-{{ cat }}">{{ msg }}</div>
-                {% endfor %}
+{% block content %}
+    <div>
+        <div class="row align-items-center" style="height: 100vh;">
+            <div class="mx-auto col-8 col-md-6 col-lg-4">
+                <div class="border border-2 border-warning rounded m-3 p-3">
+                    <form action="{{ url_for('register') }}" method="post">
+                        {{ form.hidden_tag() }}
+                        {#                <form action="{{ url_for('register') }}" method="post">#}
+                        {#                    {{ form.hidden_tag() }}#}
+                        {#                    {{ wtf.form_field(form.email) }}#}
+                        {#                    {{ wtf.form_field(form.psw) }}#}
+                        {#                    {{ wtf.form_field(form.psw2) }}#}
+                        {#                    {{ wtf.form_field(form.submit, button_map={'submit':'warning'}) }}#}
+                        {#                    <a href="{{ url_for('login') }}">Уже зарегистрированы?</a>#}
+                        {#                </form>#}
+                        {#                <br>#}
+                        {% for field in form if field.name not in ['csrf_token', 'submit'] -%}
+                            {{ field.label(class="text-warning") }}
+                            {% if field.errors %}
+                                {{ field(class="form-control mb-2 mr-sm-2") }}
+                                <div class="alert alert-danger">
+                                    {% for e in field.errors %}
+                                        {{ e }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ field(class="form-control mb-2 mr-sm-2") }}
+                            {% endif %}
+                        {% endfor %}
+                        <div class="d-flex justify-content-center">
+                            {{ form.submit(class="btn btn-warning m-2 mb-2") }}
+                            <a class="btn btn-dark m-2 mb-2" href="{{ url_for('login') }}">Уже зарегистрированы?</a>
+                        </div>
+                        {% for cat, msg in get_flashed_messages(True) %}
+                            <div class="alert alert-{{ cat }}">{{ msg }}</div>
+                        {% endfor %}
+                    </form>
+                </div>
             </div>
-            <div class="col-sm-3"></div>
         </div>
     </div>
 

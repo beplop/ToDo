@@ -1,53 +1,50 @@
-{% extends "bootstrap/base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
-{% block title %}
-    ToDo App - авторизация
-{% endblock %}
+{% extends 'layout.html' %}
+
 {% block content %}
-    <div class="container">
-        <div class="row justify-content-center">
-            <br>
-            <div class="col-sm-3"></div>
-            <div class="col-sm-6">
-                <form action="{{ url_for('login') }}" method="post">
-                    {{ form.hidden_tag() }}
-                    {{ wtf.form_field(form.email) }}
-                    {{ wtf.form_field(form.psw) }}
-                    {{ wtf.form_field(form.remember) }}
-                    {{ wtf.form_field(form.submit, button_map={'submit':'warning'}) }}
-                    <a href="{{ url_for('register') }}">Регистрация</a>
-                </form>
-                <br>
+    {#    <div class="d-flex my-auto mx-auto">#}
+    {#                <form action="{{ url_for('login') }}" method="post">#}
+    {#                    {{ form.hidden_tag() }}#}
+    {#                    {{ wtf.form_field(form.email) }}#}
+    {#                    {{ wtf.form_field(form.psw) }}#}
+    {#                    {{ wtf.form_field(form.remember) }}#}
+    {#                    {{ wtf.form_field(form.submit, button_map={'submit':'warning'}) }}#}
+    {#                    <a href="{{ url_for('register') }}">Регистрация</a>#}
+    {#                </form>#}
+    {#                <br>#}
+    <div>
+        <div class="row align-items-center" style="height: 100vh;">
+            <div class="mx-auto col-8 col-md-6 col-lg-4">
+                <div class="border border-2 border-warning rounded m-3 p-3">
+                    <form action="{{ url_for('login') }}" method="post">
+                        {{ form.hidden_tag() }}
+                        {% for field in form if field.name not in ['csrf_token', 'remember', 'submit'] -%}
 
-                {#        <form action="{{ url_for('login') }}" method="post">#}
-                {#            {{ form.hidden_tag() }}#}
-                {#            {% for field in form if field.name not in ['csrf_token', 'remember', 'submit'] -%}#}
-                {#                        <div class="mb-3">#}
-                {#                {{ field.label() }}#}
-                {#                {% if field.errors %}#}
-                {#                    {{ field(class="invalid") }}#}
-                {#                    <span>#}
-                {#                           {% for e in field.errors %}#}
-                {#                               {{ e }}#}
-                {#                           {% endfor %}#}
-                {#                 </span>#}
-                {#                {% else %}#}
-                {#                    {{ wtf.form_field(field) }}#}
-                {#                {% endif %}#}
-                {#                        </div>#}
-                {#            {% endfor %}#}
-                {#                    <div class="mb-3 form-check">#}
-                {#            {{ form.remember.label(class="form-check-label") }} {{ form.remember(class="form-check-input" ) }}#}
-                {#                    </div>#}
-                {#            {{ form.submit(class="btn btn-primary") }}#}
-                {#            <a href="{{ url_for('register') }}">Регистрация</a>#}
-                {#        </form>#}
+                            {{ field.label(class="text-warning") }}
+                            {% if field.errors %}
+                                {{ field(class="form-control mb-2 mr-sm-2") }}
+                                <div class="alert alert-danger">
+                                    {% for e in field.errors %}
+                                        {{ e }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ field(class="form-control mb-2 mr-sm-2") }}
+                            {% endif %}
+                        {% endfor %}
+                        <div class="mb-2 form-check">
+                            {{ form.remember.label(class="form-check-label") }} {{ form.remember(class="form-check-input" ) }}
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            {{ form.submit(class="btn btn-warning m-2 mb-2") }}
+                            <a class="btn btn-dark m-2 mb-2" ) href="{{ url_for('register') }}">Регистрация</a>
+                        </div>
+                    </form>
 
-                {% for cat, msg in get_flashed_messages(True) %}
-                    <div class="alert alert-{{ cat }}">{{ msg }}</div>
-                {% endfor %}
+                    {% for cat, msg in get_flashed_messages(True) %}
+                        <div class="alert alert-{{ cat }}">{{ msg }}</div>
+                    {% endfor %}
+                </div>
             </div>
-            <div class="col-sm-3"></div>
         </div>
     </div>
 
