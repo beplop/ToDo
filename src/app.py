@@ -16,6 +16,9 @@ from flask_migrate import Migrate
 from forms import LoginForm, RegisterForm, PasswordUpdateForm
 from UserLogin import UserLogin
 
+from flask_mail import Mail, Message
+from celery import Celery, Task
+
 ####
 
 
@@ -37,6 +40,55 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message = "Вы не авторизованы"
 login_manager.login_message_category = "warning"
+
+###########
+# Flask-Mail
+app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'beplop1@gmail.com'
+app.config['MAIL_DEFAULT_SENDER'] = 'beplop1@gmail.com'
+app.config['MAIL_PASSWORD'] = 'kvhd ujzu sltf srtw'
+
+mail = Mail(app)
+
+
+# Celery
+
+def celery_init_app(app: Flask) -> Celery:
+    class FlaskTask(Task):
+        def __call__(self, *args: object, **kwargs: object) -> object:
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery_app = Celery(app.name)
+    celery_app.config_from_object(app.config["CELERY"])
+    celery_app.Task = FlaskTask
+    celery_app.set_default()
+    app.extensions["celery"] = celery_app
+    return celery_app
+
+
+app.config.from_mapping(
+    CELERY=dict(
+        broker_url="redis://localhost",
+        result_backend="redis://localhost",
+        task_ignore_result=True,
+    ),
+)
+celery_app = celery_init_app(app)
+
+
+# app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+# app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+#
+# client = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+
+
+# client.conf.update(app.config)
+
+
+###########
 
 
 class Users(db.Model):
@@ -91,6 +143,18 @@ def logout():
 # conn = psycopg2.connect(dbname='flask_todo_db', user='admin',
 #                         password='admin', host='192.168.99.100', port='6500')
 
+@celery_app.task
+def send_mail():
+    """ Функция отправки эл. писем.
+    """
+    with app.app_context():
+        msg = Message("Ping test!",
+                      recipients=['artyr-xamidullin@mail.ru'])
+        msg.body = "Hello World"
+        mail.send(msg)
+        
+    return True
+
 
 @app.route('/')
 @login_required
@@ -99,6 +163,12 @@ def index():
              in
              range(1, 5)]
     tasks_scheduled_on = ['Сегодня', 'Завтра', 'На этой неделе', 'Бессрочно']
+
+    # send_mail()
+    data = 'Hello world!'
+
+    send_mail.apply_async()
+
     # tasks1 = Notes.query.filter_by(scheduled_on=1, is_archived=False, user_id=current_user.get_id()).all()
     # tasks2 = Notes.query.filter_by(scheduled_on=2, is_archived=False, user_id=current_user.get_id()).all()
     # tasks3 = Notes.query.filter_by(scheduled_on=3, is_archived=False, user_id=current_user.get_id()).all()

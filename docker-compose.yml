@@ -1,17 +1,30 @@
 version: "3"
 
 services:
-#  flask:
-#    image: flask-test2
-##    #build: .
-#    container_name: flask
-#    privileged: true
-#    ports:
-#      - "5000:5000"
-#    volumes: #?
-#      - .:/usr/src/apps/todo/
-#    depends_on:
-#      - postgres
+  #  flask:
+  #    image: flask-test2
+  ##    #build: .
+  #    container_name: flask
+  #    privileged: true
+  #    ports:
+  #      - "5000:5000"
+  ##    volumes: #?
+  ##      - .:/usr/src/apps/todo/
+  #    depends_on:
+  #      - postgres
+
+  flask:
+    image: flask-test2
+    #    #build: .
+    container_name: flask
+    privileged: true
+    ports:
+      - "5000:5000"
+    #    volumes: #?
+    #      - .:/usr/src/apps/todo/
+    depends_on:
+      - postgres
+
 
   postgres:
     image: postgres:16-alpine
