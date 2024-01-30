@@ -17,11 +17,43 @@
                                             class="fa-regular fa-circle fa-lg"
                                             style="color: #000000;"></i></a>
                                     {{ task.title }}
+                                    <!-- Кнопка-триггер модального окна -->
+                                    <button class="btn btn-light btn-sm mb-2" data-bs-toggle="modal"
+                                            data-bs-target="#Modal{{ task.id }}">
+                                        <i class="fa-solid fa-info" style="color: #000000;"></i>
+                                    </button>
+
+                                    <a href="{{ url_for('detail_view_task', task_id=task.id) }}"><i
+                                            class="fa-regular fa-pen-to-square" style="color: #000000;"></i></a>
+
                                     <a href="{{ url_for('remove_task', task_id=task.id) }}"><i
                                             class="fa-solid fa-xmark fa-lg"
                                             style="color: #f52424;"></i></a>
-                                    <a href="{{ url_for('detail_view_task', task_id=task.id) }}"><i
-                                            class="fa-solid fa-circle-info fa-lg" style="color: #74C0FC;"></i></a>
+
+
+                                    <!-- Модальное окно -->
+                                    <div class="modal fade" id="Modal{{ task.id }}" tabindex="-1"
+                                         aria-labelledby="ModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="ModalLabel">{{ task.title }}</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Закрыть"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    {{ task.text }}
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-warning"
+                                                            data-bs-dismiss="modal">Ок
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
                                 </li>
                             {% endfor %}
                         </ul>
@@ -34,15 +66,15 @@
                             <div class="col">
                                 <input class="btn btn-warning mb-2" type="submit" value="Добавить">
                             </div>
+                        </form>
                     </div>
-
-                    </form>
 
                 {% endfor %}
             </div>
             <div class="col"></div>
         </div>
     </div>
+
     {#                <h2>Сегодня</h2>#}
     {#                <ul>#}
     {#                    {% for task in tasks1 %}#}

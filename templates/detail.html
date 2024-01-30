@@ -13,8 +13,7 @@
             <h2 class="text-warning text-uppercase">Описание:</h2>
             <div class="form-floating">
                 {#            ЗДЕСЬ БАГ С ДОБАВЛЕНИЕМ ПУСТОГО ТЕКСТА#}
-                <textarea name="task_text" class="form-control mb-2 mr-sm-2">{% if task.text %}{{ task.text }}{% else %}
-                {% endif %}</textarea>
+                <textarea class="form-control mb-2">{% if task.text %}{{ task.text }}{% else %}{% endif %}</textarea>
             </div>
             {#            <input class="form-control mb-2 mr-sm-2" type="text" name="task_text"#}
             {#                   value={% if task.text %} {{ task.text }} {% else %} "" {% endif %}>#}
@@ -25,8 +24,8 @@
                 <option {% if task.scheduled_on == 3 %} selected {% endif %} value="3">На этой неделе</option>
                 <option {% if task.scheduled_on == 4 %} selected {% endif %} value="4">Бессрочно</option>
             </select>
-            <input class="btn btn-success mb-2" type="submit" value="Ок">
-            <a class="btn btn-danger mb-2" {{ url_for('task_to_archive', task_id=task.id) }}
+            <input class="btn btn-warning mb-2" type="submit" value="Ок">
+            <a class="btn btn-dark mb-2" {{ url_for('task_to_archive', task_id=task.id) }}
                href="/to_archive/{{ task.id }}">Переместить в архив</a>
         </form>
     </div>
