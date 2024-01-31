@@ -248,9 +248,9 @@ def update_task(task_id):
     return redirect('/')
 
 
-@app.route('/remove/<int:task_id>')
+@app.route('/remove/<int:task_id>/redirect/<url>')
 @login_required
-def remove_task(task_id):
+def remove_task(task_id, url):
     try:
         task_to_remove = Notes.query.get(task_id)
         db.session.delete(task_to_remove)
@@ -258,7 +258,7 @@ def remove_task(task_id):
     except:
         db.session.rollback()
         print("Ошибка удаления из БД")
-    return redirect('/')
+    return redirect(url_for(url))
 
 
 @app.route('/to_archive/<int:task_id>')

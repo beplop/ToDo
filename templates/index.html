@@ -6,17 +6,22 @@
     <div class="container">
         <div class="row">
             <div class="col"></div>
-            <div class="col">
+            <div class="col-auto">
                 {% for task_block in tasks %}
                     <h2 class="text-warning text-uppercase text-center">{{ tasks_scheduled_on[loop.index0] }}</h2>
-                    <div class="border border-2 border-warning rounded m-3 p-3">
+                    <div class="border border-2 border-warning rounded m-3 p-3 ">
                         <ul class="list-inline">
                             {% for task in task_block %}
                                 <li>
                                     <a href="{{ url_for('task_to_archive', task_id=task.id) }}"><i
                                             class="fa-regular fa-circle fa-lg"
                                             style="color: #000000;"></i></a>
-                                    {{ task.title }}
+                                    {#                                    {% if task.title|length > 23 %}#}
+                                    {% if 'Mobile' in request.user_agent.string %}
+                                        {{ task.title[:24] + "..." if task.title|length > 23 else task.title }}
+                                    {% else %}
+                                        {{ task.title }}
+                                    {% endif %}
                                     <!-- Кнопка-триггер модального окна -->
                                     <button class="btn btn-light btn-sm mb-2" data-bs-toggle="modal"
                                             data-bs-target="#Modal{{ task.id }}">
@@ -26,7 +31,7 @@
                                     <a href="{{ url_for('detail_view_task', task_id=task.id) }}"><i
                                             class="fa-regular fa-pen-to-square" style="color: #000000;"></i></a>
 
-                                    <a href="{{ url_for('remove_task', task_id=task.id) }}"><i
+                                    <a href="{{ url_for('remove_task', task_id=task.id, url='index') }}"><i
                                             class="fa-solid fa-xmark fa-lg"
                                             style="color: #f52424;"></i></a>
 
