@@ -50,3 +50,10 @@ class PasswordRecoveryForm(FlaskForm):
 class GetEmailForm(FlaskForm):
     email = StringField("Email: ", validators=[Email("Некорректный email")])
     submit = SubmitField("Далее")
+
+
+class EmailConfirmationForm(FlaskForm):
+    code = StringField("Код, полученный на e-mail: ", validators=[DataRequired(),
+                                                                  Length(min=4, max=4,
+                                                                         message="Код должен состоять из четырёх цифр")])
+    submit = SubmitField("Ок")

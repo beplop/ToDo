@@ -13,7 +13,7 @@ from psycopg2.extras import DictCursor
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-from forms import LoginForm, RegisterForm, PasswordUpdateForm, PasswordRecoveryForm, GetEmailForm
+from forms import LoginForm, RegisterForm, PasswordUpdateForm, PasswordRecoveryForm, GetEmailForm, EmailConfirmationForm
 from UserLogin import UserLogin
 
 from flask_mail import Mail, Message
@@ -309,22 +309,56 @@ def register():
                 flash("Такой пользователь уже существует", "danger")
                 return redirect(url_for('register'))
             else:
-                hash_psw = generate_password_hash(request.form['psw'])
-                u = Users(email=form.email.data, password=hash_psw)
-                db.session.add(u)
-                db.session.commit()
+                session['email'] = form.email.data
+                session['hash_psw'] = generate_password_hash(request.form['psw'])
+
+                recovery_code = secrets.randbelow(9999 - 1000) + 1000
+                session['recovery_code'] = recovery_code
+                send_mail.apply_async(
+                    args=[recovery_code, session['email'], 'Ваш код для регистрации в ToDo App', 'регистрация'])
+
+                flash("На вашу почту отправлен код для смены пароля", "success")
+                return redirect(url_for('email_confirmation'))
+                # hash_psw = generate_password_hash(request.form['psw'])
+                # u = Users(email=form.email.data, password=hash_psw)
+                # db.session.add(u)
+                # db.session.commit()
         except Exception as e:
-            db.session.rollback()
+            # db.session.rollback()
             print(e)
             return redirect(url_for('register'))
-        flash("Вы успешно зарегистрированы", "success")
-        return redirect(url_for('login'))
     else:
         if form.is_submitted():
             # log
             flash("Ошибка при регистрации", "danger")
             print('Даннные формы введены неверно или что-то пошло не так')
     return render_template("register.html", form=form, title='Регистрация')
+
+
+@app.route("/email_confirmation", methods=["POST", "GET"])
+def email_confirmation():
+    form = EmailConfirmationForm()
+    if form.validate_on_submit():
+        try:
+            if str(session['recovery_code']) == form.code.data:
+                u = Users(email=session['email'], password=session['hash_psw'])
+                db.session.add(u)
+                db.session.commit()
+                flash("Вы успешно зарегистрировались!", "success")
+                return redirect(url_for('login'))
+            else:
+                flash("Код из e-mail введён неверно!", "danger")
+                return redirect(url_for('email_confirmation'))
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+            return redirect(url_for('register'))
+    else:
+        if form.is_submitted():
+            # log
+            flash("Ошибка при регистрации", "danger")
+            print('Даннные формы введены неверно или что-то пошло не так')
+    return render_template("email_confirmation.html", form=form, title='Подтверждение e-mail')
 
 
 # methods=["POST", "GET"] ???
@@ -379,13 +413,13 @@ def profile():
 
 
 @celery_app.task
-def send_mail(recovery_code):
+def send_mail(recovery_code, email, msg_body, msg_head):
     """ Функция отправки эл. письма с кодом для восстановления пароля
     """
     with app.app_context():
-        msg = Message("ToDo App - восстановление пароля",
-                      recipients=['artyr-xamidullin@mail.ru'])
-        msg.body = f"Ваш код для восстановления пароля: {recovery_code}"
+        msg = Message(f"ToDo App - {msg_head}",
+                      recipients=[email])
+        msg.body = f"{msg_body}: {recovery_code}"
         mail.send(msg)
 
     # task_id = send_mail.request.id
@@ -405,7 +439,8 @@ def get_email():
 
                 recovery_code = secrets.randbelow(9999 - 1000) + 1000
                 session['recovery_code'] = recovery_code
-                send_mail.apply_async(args=[recovery_code])
+                send_mail.apply_async(args=[recovery_code, session['email'], 'Ваш код для восстановления пароля',
+                                            'восстановление пароля'])
 
                 flash("На вашу почту отправлен код для смены пароля", "success")
                 return redirect(url_for('psw_recovery'))
@@ -454,8 +489,9 @@ def psw_recovery():
 
             #     print('код верный')
             #     flash("Код из e-mail ВЕРНЫЙ", "success")
-            # else:
-            #     flash("Код из e-mail введён неверно!", "danger")
+            else:
+                flash("Код из e-mail введён неверно!", "danger")
+                return redirect(url_for('psw_recovery'))
         except Exception as e:
             db.session.rollback()
             print(e)
