@@ -42,7 +42,7 @@
                                                             aria-label="Закрыть"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    {{ task.text }}
+                                                    {% if task.text %}{{ task.text }}{% else %}{% endif %}
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-warning"

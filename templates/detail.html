@@ -11,12 +11,17 @@
             <h2 class="text-warning text-uppercase">Задача:</h2>
             <input class="form-control mb-2 mr-sm-2" type="text" name="task_title" value={{ task.title }}>
             <h2 class="text-warning text-uppercase">Описание:</h2>
-            <div class="form-floating">
-                {#            ЗДЕСЬ БАГ С ДОБАВЛЕНИЕМ ПУСТОГО ТЕКСТА#}
-                <textarea class="form-control mb-2">{% if task.text %}{{ task.text }}{% else %}{% endif %}</textarea>
-            </div>
+            {#            <div class="form-floating">#}
+            {#            ЗДЕСЬ БАГ С ДОБАВЛЕНИЕМ ПУСТОГО ТЕКСТА#}
+
+            {% if task.text %}
+                <textarea rows="3" name="task_text" class="form-control mb-2">{{ task.text }}</textarea>
+            {% else %}
+                <textarea rows="3" name="task_text" class="form-control mb-2"></textarea>
+            {% endif %}
+            {#            </div>#}
             {#            <input class="form-control mb-2 mr-sm-2" type="text" name="task_text"#}
-            {#                   value={% if task.text %} {{ task.text }} {% else %} "" {% endif %}>#}
+            {#            value={% if task.text %}{{ task.text }}{% else %}""{% endif %}>#}
             <label for="task_scheduled_on"><h3 class="text-warning text-uppercase">Запланировано на:</h3></label>
             <select class="form-select mb-2" name="task_scheduled_on" id="task_scheduled_on">
                 <option {% if task.scheduled_on == 1 %} selected {% endif %} value="1">Сегодня</option>
