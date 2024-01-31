@@ -15,6 +15,8 @@ USER myuser
 WORKDIR /usr/apps/todo/src/
 
 CMD python app.py
+
+
 #ENV PIP_PROGRESS_BAR off
 #RUN pip install --no-cache-dir --disable-pip-version-check -r requirements.txt
 #WORKDIR /usr/apps/todo/src/

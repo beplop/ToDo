@@ -48,7 +48,7 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'beplop1@gmail.com'
 app.config['MAIL_DEFAULT_SENDER'] = 'beplop1@gmail.com'
-app.config['MAIL_PASSWORD'] = 'kvhd ujzu sltf srtw'
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 
 mail = Mail(app)
 
@@ -71,8 +71,8 @@ def celery_init_app(app: Flask) -> Celery:
 
 app.config.from_mapping(
     CELERY=dict(
-        broker_url="redis://localhost",
-        result_backend="redis://localhost",
+        broker_url="redis://192.168.99.100:6379/0",
+        result_backend="redis://192.168.99.100:6379/0",
         task_ignore_result=True,
     ),
 )
@@ -150,9 +150,9 @@ def send_mail():
     with app.app_context():
         msg = Message("Ping test!",
                       recipients=['artyr-xamidullin@mail.ru'])
-        msg.body = "Hello World"
+        msg.body = "Hello World - new"
         mail.send(msg)
-        
+
     return True
 
 
@@ -165,8 +165,8 @@ def index():
     tasks_scheduled_on = ['Сегодня', 'Завтра', 'На этой неделе', 'Бессрочно']
 
     # send_mail()
-    data = 'Hello world!'
-
+    # data = 'Hello world!'
+    #
     send_mail.apply_async()
 
     # tasks1 = Notes.query.filter_by(scheduled_on=1, is_archived=False, user_id=current_user.get_id()).all()
