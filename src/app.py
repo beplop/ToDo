@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from functools import reduce
 
-from flask import Flask, request, redirect, render_template, url_for, flash
+from flask import Flask, request, redirect, render_template, url_for, flash, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_bootstrap import Bootstrap
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -13,11 +13,12 @@ from psycopg2.extras import DictCursor
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-from forms import LoginForm, RegisterForm, PasswordUpdateForm
+from forms import LoginForm, RegisterForm, PasswordUpdateForm, PasswordRecoveryForm, GetEmailForm
 from UserLogin import UserLogin
 
 from flask_mail import Mail, Message
 from celery import Celery, Task
+import secrets
 
 ####
 
@@ -143,18 +144,6 @@ def logout():
 # conn = psycopg2.connect(dbname='flask_todo_db', user='admin',
 #                         password='admin', host='192.168.99.100', port='6500')
 
-@celery_app.task
-def send_mail():
-    """ Функция отправки эл. писем.
-    """
-    with app.app_context():
-        msg = Message("Ping test!",
-                      recipients=['artyr-xamidullin@mail.ru'])
-        msg.body = "Hello World - new"
-        mail.send(msg)
-
-    return True
-
 
 @app.route('/')
 @login_required
@@ -167,7 +156,7 @@ def index():
     # send_mail()
     # data = 'Hello world!'
     #
-    send_mail.apply_async()
+    # send_mail.apply_async()
 
     # tasks1 = Notes.query.filter_by(scheduled_on=1, is_archived=False, user_id=current_user.get_id()).all()
     # tasks2 = Notes.query.filter_by(scheduled_on=2, is_archived=False, user_id=current_user.get_id()).all()
@@ -338,6 +327,7 @@ def register():
     return render_template("register.html", form=form, title='Регистрация')
 
 
+# methods=["POST", "GET"] ???
 @app.route('/profile', methods=["POST", "GET"])
 @login_required
 def profile():
@@ -386,6 +376,99 @@ def profile():
 
     return render_template('profile.html', title='Профиль', cur_page=3, form=form, tasks_count=tasks_count,
                            tasks_count_archived=tasks_count_archived)
+
+
+@celery_app.task
+def send_mail(recovery_code):
+    """ Функция отправки эл. письма с кодом для восстановления пароля
+    """
+    with app.app_context():
+        msg = Message("ToDo App - восстановление пароля",
+                      recipients=['artyr-xamidullin@mail.ru'])
+        msg.body = f"Ваш код для восстановления пароля: {recovery_code}"
+        mail.send(msg)
+
+    # task_id = send_mail.request.id
+    # print("send_mail", task_id)
+
+    return True
+
+
+@app.route("/get_email", methods=["POST", "GET"])
+def get_email():
+    form = GetEmailForm()
+
+    if form.validate_on_submit():
+        try:
+            if Users.query.filter(Users.email == form.email.data).first():
+                session['email'] = form.email.data
+
+                recovery_code = secrets.randbelow(9999 - 1000) + 1000
+                session['recovery_code'] = recovery_code
+                send_mail.apply_async(args=[recovery_code])
+
+                flash("На вашу почту отправлен код для смены пароля", "success")
+                return redirect(url_for('psw_recovery'))
+            else:
+                flash("Пользователь с таким e-mail не зарегистрирован", "danger")
+                return redirect(url_for('get_email'))
+        except Exception as e:
+            print(e)
+            return redirect(url_for('get_email'))
+    else:
+        if form.is_submitted():
+            # log
+            flash("Ошибка при вводе e-mail", "danger")
+            print('Даннные формы введены неверно или что-то пошло не так')
+    return render_template("get_email.html", form=form, title='Ввод почты для восстановления пароля')
+
+    # celery_task_id = send_mail.apply_async(args=[recovery_code])
+
+    # print('psw_recovery_id =', celery_task_id)
+
+
+@app.route('/psw_recovery', methods=["POST", "GET"])
+def psw_recovery():
+    form = PasswordRecoveryForm()
+
+    if form.validate_on_submit():
+        try:
+            if str(session['recovery_code']) == form.code.data:
+                user = Users.query.filter(Users.email == session['email']).first()
+                # hash_current_psw = generate_password_hash(request.form['psw_current'])
+
+                if form.psw_new.data == user.password:
+                    flash("Новый пароль совпадает со старым", "danger")
+                    return redirect(url_for('psw_recovery'))
+                else:
+                    hash_new_psw = generate_password_hash(request.form['psw_new'])
+
+                    db.session.query(Users).filter(Users.id == user.id).update(
+                        {"password": hash_new_psw}, synchronize_session="fetch"
+                    )
+
+                    # result = db.session.execute(stmt)
+
+                    # db.session.execute(stmt)
+                    db.session.commit()
+
+            #     print('код верный')
+            #     flash("Код из e-mail ВЕРНЫЙ", "success")
+            # else:
+            #     flash("Код из e-mail введён неверно!", "danger")
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+            return redirect(url_for('psw_recovery'))
+        flash("Вы успешно сменили пароль", "success")
+        return redirect(url_for('login'))
+    else:
+        if form.is_submitted():
+            # log
+            flash("Ошибка при смене пароля", "danger")
+            print('Даннные формы введены неверно или что-то пошло не так')
+
+    return render_template('psw_recovery.html', title='Восстановление пароля', form=form)
 
 
 # @app.route('/')
